@@ -1,0 +1,25 @@
+{
+  "name": "Sudachi",
+  "version": "0.0.1",
+  "description": "Sudachi is limechat's theme",
+  "main": "Sudachi.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/yhmt/sudachi.git"
+  },
+  "author": "@yuya",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "gitHead": "c602ebe26df2f0c09a05a881acf7467850130fd1",
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-watch": "~0.3.1",
+    "grunt-exec": "~0.4.0",
+    "grunt-contrib-coffee": "~0.7.0",
+    "grunt-contrib-jshint": "~0.4.3",
+    "grunt-notify": "~0.2.3"
+  }
+}
