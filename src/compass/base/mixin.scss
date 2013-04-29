@@ -1,0 +1,11 @@
+@import "compass";
+
+// mixin
+@mixin prefix ($prop, $val) {
+    -webkit-#{$prop}: #{$val};
+    #{$prop}: #{$val};
+}
+@mixin prefix-value ($prop, $val) {
+    #{$prop}: -webkit-#{$val};
+    #{$prop}: #{$val};
+}

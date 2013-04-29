@@ -16,10 +16,11 @@
   "gitHead": "c602ebe26df2f0c09a05a881acf7467850130fd1",
   "devDependencies": {
     "grunt": "~0.4.1",
-    "grunt-contrib-watch": "~0.3.1",
     "grunt-exec": "~0.4.0",
+    "grunt-notify": "~0.2.3",
+    "grunt-contrib-sass": "~0.3.0",
     "grunt-contrib-coffee": "~0.7.0",
-    "grunt-contrib-jshint": "~0.4.3",
-    "grunt-notify": "~0.2.3"
+    "grunt-contrib-watch": "~0.3.1",
+    "grunt-contrib-jshint": "~0.4.3"
   }
 }

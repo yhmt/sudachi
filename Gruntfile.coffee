@@ -4,18 +4,31 @@ module.exports = (grunt) ->
     exec:
       sync:
         cmd: -> "./sync.sh"
+    sass:
+      dist:
+        files:
+          "Sudachi.css": "src/compass/Sudachi.scss"
+        options:
+          style: "compressed"
+          compass: "src/compass/config.rb"
     coffee:
-      src:
+      dist:
         options:
           bare: true
         files:
           "Sudachi.js": "src/Sudachi.coffee"
     watch:
-      src:
-        files: ["src/*.coffee"]
+      dist:
+        files: ["src/compass/**/*.scss", "src/*.coffee"]
         tasks: "compile"
+      css:
+        files: ["src/compass/**/*.scss"]
+        tasks: "css"
+      js:
+        files: ["src/*.coffee"]
+        tasks: "js"
     jshint:
-      src: ["Sudachi.js"]
+      dist: ["Sudachi.js"]
       options:
         curly:   true
         eqeqeq:  true
@@ -32,15 +45,17 @@ module.exports = (grunt) ->
         devel:   true
 
   grunt.loadNpmTasks "grunt-exec"
+  grunt.loadNpmTasks "grunt-notify"
+  grunt.loadNpmTasks "grunt-contrib-sass"
   grunt.loadNpmTasks "grunt-contrib-coffee"
   # grunt.loadNpmTasks "grunt-contrib-uglify"
   grunt.loadNpmTasks "grunt-contrib-jshint"
   grunt.loadNpmTasks "grunt-contrib-watch"
-  grunt.loadNpmTasks "grunt-notify"
 
-  grunt.registerTask "compile", ["coffee:src", "jshint:src", "exec:sync"]
+  grunt.registerTask "compile", ["coffee", "sass", "jshint", "exec:sync"]
   grunt.registerTask "test",    ["coffee:test", "exec:mocha"]
-  # grunt.registerTask "prod",    ["compile", "test", "uglify"]
+  grunt.registerTask "css",     ["sass", "exec:sync"]
+  grunt.registerTask "js",      ["coffee", "jshint", "exec:sync"]
   grunt.registerTask "prod",    ["compile"]
 
   grunt.registerTask "default", ["prod"]
