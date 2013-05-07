@@ -7,42 +7,47 @@ module.exports = (grunt) ->
     sass:
       dist:
         files:
-          "Sudachi.css": "src/compass/Sudachi.scss"
+          "sudachi.css": "src/compass/sudachi.scss"
         options:
           style: "compressed"
           compass: "src/compass/config.rb"
     coffee:
       dist:
         options:
+          join: true
           bare: true
         files:
-          "Sudachi.js": "src/Sudachi.coffee"
+          "sudachi.js": [
+            "src/coffee/helper.coffee"
+            "src/coffee/sudachi.coffee"
+          ]
     watch:
       dist:
-        files: ["src/compass/**/*.scss", "src/*.coffee"]
+        files: ["src/compass/**/*.scss", "src/**/*.coffee"]
         tasks: "compile"
       css:
         files: ["src/compass/**/*.scss"]
         tasks: "css"
       js:
-        files: ["src/*.coffee"]
+        files: ["src/**/*.coffee"]
         tasks: "js"
     jshint:
-      dist: ["Sudachi.js"]
+      dist: ["sudachi.js"]
       options:
-        curly:   true
-        eqeqeq:  true
-        immed:   true
-        latedef: true
-        newcap:  true
-        noarg:   true
-        sub:     true
-        undef:   true
-        boss:    true
-        eqnull:  true
-        es5:     true
-        dojo:    true
-        devel:   true
+        curly:       true
+        eqeqeq:      true
+        immed:       true
+        latedef:     true
+        newcap:      true
+        noarg:       true
+        sub:         true
+        undef:       true
+        boss:        true
+        eqnull:      true
+        es5:         true
+        dojo:        true
+        devel:       true
+        prototypejs: true
 
   grunt.loadNpmTasks "grunt-exec"
   grunt.loadNpmTasks "grunt-notify"

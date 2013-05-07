@@ -1,49 +1,95 @@
+Element.prototype.hasClass = function(klassName) {
+  return new RegExp("(\\s|^)" + klassName + "(\\s|$)").test(this.className);
+};
+
+Element.prototype.addClass = function(klassName) {
+  if (!this.hasClass(klassName)) {
+    this.className += (this.className ? " " : "") + klassName;
+  }
+};
+
+Element.prototype.removeClass = function(klassName) {
+  if (this.hasClass(klassName)) {
+    return this.className = this.className.replace(new RegExp("(\\s|^)" + klassName + "(\\s|$)"), " ").replace(/^s+|\s+$/g, "");
+  }
+};
+
 (function(global, document) {
-  var addClass, hasClass, imgBase, removeClass;
+  var checkUserId, findUserName, members, processLine, setUserIcon;
 
-  imgBase = "emojis/";
-  hasClass = function(el, name) {
-    return new RegExp('(\\s|^)' + name + '(\\s|$)').test(el.className);
-  };
-  addClass = function(el, name) {
-    if (!hasClass(el, name)) {
-      el.className += (el.className ? " " : "") + name;
+  members = null;
+  checkUserId = function(nick) {
+    var pattern, userId;
+
+    pattern = /_$|_away$/i;
+    if (pattern.test(nick)) {
+      return userId = nick.replace(pattern, "");
     }
   };
-  removeClass = function(el, name) {
-    if (hasClass(el, name)) {
-      el.className = el.className.replace(new RegExp("(\\s|^)" + name + "(\\s|$)"), " ").replace(/^\s+|\s+$/g, "");
-    }
-  };
-  return document.addEventListener("DOMNodeInserted", function(event) {
-    var avatar, emoji, isFirst, line, matchName, message, nick, sender, senderType, type;
+  findUserName = function(userId, el) {
+    var len;
 
-    line = event.target;
-    type = line.getAttribute("type");
-    nick = line.getAttribute("nick");
-    avatar = document.createElement("div");
-    emoji = document.createElement("img");
-    switch (type) {
+    len = members.length;
+    while (len) {
+      len--;
+      if (userId === members[len].id) {
+        return members[len].name;
+      }
+    }
+    return void 0;
+  };
+  setUserIcon = function(el, user) {
+    var icon;
+
+    icon = document.createElement("div");
+    icon.className = "icon";
+    icon.style.backgroundImage = "url(avatar/" + user.id + ".png)";
+    el.sender.setAttribute("data-name", user.name);
+    return el.line.insertBefore(icon, el.sender);
+  };
+  processLine = function(event) {
+    var el, user;
+
+    user = {};
+    el = (function() {
+      var target;
+
+      target = event.target;
+      return {
+        line: target,
+        type: target.getAttribute("type"),
+        nick: target.getAttribute("nick"),
+        time: target.getElementsByTagName("span")[0],
+        sender: target.getElementsByTagName("span")[1],
+        message: target.getElementsByTagName("span")[2]
+      };
+    })();
+    switch (el.type) {
       case "privmsg":
-        sender = line.getElementsByClassName("sender")[0];
-        isFirst = sender.getAttribute("first") === "true" ? true : false;
-        message = line.getElementsByClassName("message")[0];
-        matchName = message.innerHTML.match(/:([\d\w+-_]+):/);
-        senderType = sender.getAttribute("type");
-        if (isFirst) {
-          addClass(line, "first");
-          sender.setAttribute("data-name", "橋本 雄也");
-          avatar.className = "avatar";
-          avatar.style.backgroundImage = "url(avatar/" + nick + ".png)";
-          line.insertBefore(avatar, sender);
+      case "notice":
+        if (el.sender.getAttribute("type") === "myself") {
+          el.line.addClass("myself");
         }
-        if (senderType === "myself") {
-          addClass(line, "myself");
+        if (el.sender.getAttribute("first") === "true") {
+          el.line.addClass("first");
+          user.id = checkUserId(el.nick);
+          user.name = findUserName(user.id, el.line);
+          el.line.setAttribute("data-id", user.id);
+          el.line.setAttribute("data-name", user.name);
+          if (user.name) {
+            return setUserIcon(el, user);
+          }
         }
-        emoji.className = "emoji";
-        emoji.src = "" + imgBase + matchName[1] + ".png";
-        line.appendChild(emoji);
-        return message.innerHTML = message.innerHTML.replace(/:[\d\w+-_]+:/g, "");
     }
-  }, false);
+  };
+  return (function(xhr) {
+    xhr.open("GET", "member.json");
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4) {
+        members = JSON.parse(xhr.responseText);
+        return document.addEventListener("DOMNodeInserted", processLine, false);
+      }
+    };
+    return xhr.send();
+  })(new global.XMLHttpRequest());
 })(this, this.document);
