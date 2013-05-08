@@ -19,11 +19,13 @@ Element.prototype.removeClass = function(klassName) {
 
   members = null;
   checkUserId = function(nick) {
-    var pattern, userId;
+    var pattern;
 
     pattern = /_$|_away$/i;
     if (pattern.test(nick)) {
-      return userId = nick.replace(pattern, "");
+      return nick.replace(pattern, "");
+    } else {
+      return nick;
     }
   };
   findUserName = function(userId, el) {
@@ -86,8 +88,13 @@ Element.prototype.removeClass = function(klassName) {
     xhr.open("GET", "member.json");
     xhr.onreadystatechange = function() {
       if (xhr.readyState === 4) {
-        members = JSON.parse(xhr.responseText);
-        return document.addEventListener("DOMNodeInserted", processLine, false);
+        switch (xhr.status) {
+          case 0:
+          case 200:
+          case 304:
+            members = JSON.parse(xhr.responseText);
+            return document.addEventListener("DOMNodeInserted", processLine, false);
+        }
       }
     };
     return xhr.send();

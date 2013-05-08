@@ -1,11 +1,13 @@
 do (global = this, document = this.document) ->
-  members  = null
+  members = null
 
   checkUserId = (nick) ->
     pattern = /_$|_away$/i
 
     if pattern.test(nick)
-      userId = nick.replace(pattern, "")
+      return nick.replace(pattern, "")
+    else
+      return nick
 
   findUserName = (userId, el) ->
     len = members.length
@@ -59,6 +61,8 @@ do (global = this, document = this.document) ->
     xhr.open("GET", "member.json")
     xhr.onreadystatechange = ->
       if xhr.readyState is 4
-        members = JSON.parse(xhr.responseText)
-        document.addEventListener "DOMNodeInserted", processLine, false
+        switch xhr.status
+          when 0, 200, 304
+            members = JSON.parse(xhr.responseText)
+            document.addEventListener "DOMNodeInserted", processLine, false
     xhr.send()
