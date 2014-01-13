@@ -1,0 +1,7 @@
+=prefix($prop, $val)
+  -webkit-#{$prop}: #{$val}
+  #{$prop}: #{$val}
+
+=prefix-value($prop, $val)
+  #{$prop}: -webkit-#{$val}
+  #{$prop}: #{$val}

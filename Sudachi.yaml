@@ -1,9 +1,7 @@
-# All colors must be in the form of '#rrggbb' or '#rgb'.
-# You cannot use color names.
-
 log-view:
   nickname-format: '%n '
   scroller-highlight-color: '#f0f'
+
 input-text:
   font-family: 'Lucida Grande'
   font-size: 13.0
@@ -11,6 +9,7 @@ input-text:
   color: '#000'
   selected:
     background-color: '#ccc'
+
 member-list:
   font-family: 'Lucida Grande'
   font-size: 13.0
@@ -26,6 +25,7 @@ member-list:
       bottom-line-color: '#888'
       top-color: '#888'
       bottom-color: '#888'
+
 server-tree:
   font-family: 'Lucida Grande'
   font-size: 13.0
@@ -52,3 +52,4 @@ server-tree:
       bottom-line-color: '#8c98b0'
       top-color: '#adbbd0'
       bottom-color: '#98aac4'
+

@@ -1,66 +1,125 @@
+matchdep = require "matchdep"
+opts     = do ->
+  if process.argv[2] isnt undefined
+    args = process.argv[2].split ":"
+    return {
+      task       : args[0]
+      env        : if args[1] is ("dev" or "development") then "dev" else "prod"
+      livereload : if args[2] then true  else false
+    }
+  else
+    return {
+      env        : "prod"
+      livereload : false
+    }
+
+GASEditorUrl   = "https://script.google.com/macros/d/M-gqawwE45MDT6VmVX2GBLvU7gQ7yGVRP/edit"
 module.exports = (grunt) ->
-  grunt.initConfig
+  config =
     pkg: grunt.file.readJSON "package.json"
+
     exec:
+      purr:
+        cmd: -> "afplay /System/Library/Sounds/Purr.aiff"
       sync:
-        cmd: -> "./sync.sh"
-    sass:
-      dist:
-        files:
-          "sudachi.css": "src/compass/sudachi.scss"
-        options:
-          style: "compressed"
-          compass: "src/compass/config.rb"
+        cmd: -> "tools/sync_files.sh"
+      reload:
+        cmd: -> "tools/reload_theme.scpt"
+      lint_gas_prepare:
+        cmd: -> "cp -f src/gas/Code.gs src/gas/Code.js"
+      lint_gas_restore:
+        cmd: -> "rm -f src/gas/Code.js"
+      pbcopy_gas_file:
+        cmd: -> "node tools/pbcopy.js #{__dirname}/src/gas/Code.gs | pbcopy"
+      open_gas_editor:
+        cmd: -> "tools/open_gas_editor.scpt #{GASEditorUrl}"
+
+    esteWatch:
+      options:
+        dirs: [
+          "src/coffee/**/"
+          "src/compass/**/"
+          "src/gas/**/"
+        ]
+        livereload:
+          enabled: false
+
+      coffee: (filePath) ->
+        ret = ["coffee", "jshint:main"]
+
+        if opts.livereload then ret.push "reload"
+
+        return ret
+
+      sass: (filePath) ->
+        task = if opts.env is "prod" then "prod" else "dev"
+        ret  = ["compass:#{task}"]
+
+        if opts.livereload then ret.push "reload"
+
+        return ret
+
+      gs: (filePath) ->
+        ret = [
+          "exec:lint_gas_prepare"
+          "jshint:gas"
+          "exec:lint_gas_restore"
+          "exec:pbcopy_gas_file"
+          "exec:open_gas_editor"
+        ]
+
+        return ret
+
     coffee:
       dist:
         options:
           join: true
           bare: true
         files:
-          "sudachi.js": [
-            "src/coffee/helper.coffee"
-            "src/coffee/sudachi.coffee"
+          "Sudachi.js": [
+            "src/coffee/_intro.coffee"
+            "src/coffee/_CONFIG.coffee"
+            "src/coffee/_variable.coffee"
+            "src/coffee/_members_list.coffee"
+            "src/coffee/_message_handler.coffee"
+            "src/coffee/Sudachi.coffee"
+            "src/coffee/_outro.coffee"
           ]
-    watch:
-      dist:
-        files: ["src/compass/**/*.scss", "src/**/*.coffee"]
-        tasks: "compile"
-      css:
-        files: ["src/compass/**/*.scss"]
-        tasks: "css"
-      js:
-        files: ["src/**/*.coffee"]
-        tasks: "js"
+
+    compass:
+      prod:
+        options:
+          environment: "production"
+          config: "src/compass/config.rb"
+      dev:
+        options:
+          environment: "development"
+          config: "src/compass/config.rb"
+
     jshint:
-      dist: ["sudachi.js"]
-      options:
-        curly:       true
-        eqeqeq:      true
-        immed:       true
-        latedef:     true
-        newcap:      true
-        noarg:       true
-        sub:         true
-        undef:       true
-        boss:        true
-        eqnull:      true
-        es5:         true
-        dojo:        true
-        devel:       true
-        prototypejs: true
+      main    : ["Sudachi.js"]
+      gas     : ["src/gas/Code.js"]
+      options : do ->
+        ret = { globals: {} }
+        opt = ["eqeqeq" , "immed"  , "latedef" , "shadow" , "sub" , "undef" ,
+               "boss"   , "eqnull" , "browser" , "devel"  , "loopfunc"]
+        ns  = ["SpreadsheetApp" , "DriveApp" , "UrlFetchApp",
+               "ContentService" , "Browser"]
 
-  grunt.loadNpmTasks "grunt-exec"
-  grunt.loadNpmTasks "grunt-notify"
-  grunt.loadNpmTasks "grunt-contrib-sass"
-  grunt.loadNpmTasks "grunt-contrib-coffee"
-  # grunt.loadNpmTasks "grunt-contrib-uglify"
-  grunt.loadNpmTasks "grunt-contrib-jshint"
-  grunt.loadNpmTasks "grunt-contrib-watch"
+        for o in opt then ret[o]         = true
+        for n in ns  then ret.globals[n] = true
 
-  grunt.registerTask "compile", ["coffee", "sass", "jshint", "exec:sync"]
-  grunt.registerTask "test",    ["coffee:test", "exec:mocha"]
-  grunt.registerTask "css",     ["sass", "exec:sync"]
-  grunt.registerTask "js",      ["coffee", "jshint", "exec:sync"]
-  grunt.registerTask "prod",    ["compile"]
+        return ret
 
-  grunt.registerTask "default", ["prod"]
+  grunt.initConfig config
+  matchdep.filterDev("grunt-*").forEach grunt.loadNpmTasks
+
+  grunt.registerTask "default", ["esteWatch"]
+  # grunt.registerTask "reload",  ["exec:sync", "exec:reload", "exec:purr"]
+  grunt.registerTask "reload",  ["exec:sync", "exec:purr"]
+
+  grunt.registerTask "watch", "watching coffee/compass files.", ->
+    console.log "environment : %s", opts.env
+    console.log "livereload  : %s", opts.livereload
+
+    grunt.task.run "esteWatch"

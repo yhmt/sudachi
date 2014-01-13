@@ -11,33 +11,12 @@ var CONF = {
         ICON_PREVIEW  : 4,
         ORIGINAL_ICON : 5
     },
-    spreadsheet = SpreadsheetApp.getActiveSpreadsheet(),
-    sheet       = SpreadsheetApp.getActiveSheet(),
-    // spreadsheet = SpreadsheetApp.openById("0AkiE9r2RNrWhdC11UUFhT2V4WVVwbXVjNHY2WmN2LVE"),
-    // sheet       = spreadsheet.getSheetByName("シート1"),
+    // spreadsheet = SpreadsheetApp.getActiveSpreadsheet(),
+    // sheet       = SpreadsheetApp.getActiveSheet(),
+    spreadsheet = SpreadsheetApp.openById("0AkiE9r2RNrWhdC11UUFhT2V4WVVwbXVjNHY2WmN2LVE"),
+    sheet       = spreadsheet.getSheetByName("シート1"),
     iconIdRegex = /https?:\/\/docs\.google\.com\/file\/d\/(\w+)\/edit/,
     iconBaseUrl = "http://drive.google.com/uc?export=download&id=";
-
-function onOpen() {
-    var subMenus = [];
-    
-    subMenus.push({name: "fetchAllIcon", functionName: "fetchAllIcon"});
-    subMenus.push({name: "setRowHeight", functionName: "setRowHeightAll"});
-
-    spreadsheet.addMenu("Custom Menu", subMenus);
-}
-
-function doGet(req) {
-    var res = {
-        data : createJSON()
-    };
-
-    return ContentService
-            // .createTextOutput(JSON.stringify(res))
-            // .createTextOutput("callback(" + JSON.stringify(res) + ")")
-            .createTextOutput(req.parameters.callback + "(" + JSON.stringify(res) + ")")
-            .setMimeType(ContentService.MimeType.JSON);
-}
 
 function getIconUrl(row) {
     if (!row) {
@@ -45,7 +24,7 @@ function getIconUrl(row) {
     }
 
     var folder   = DriveApp.getFoldersByName(CONF.FOLDER_NAME).next(),
-        userId   = sheet.getRange(row, CELL.ID).getValue()
+        userId   = sheet.getRange(row, CELL.ID).getValue(),
         origIcon = sheet.getRange(row, CELL.ORIGINAL_ICON).getValue(),
         iconBlob = UrlFetchApp.fetch(origIcon).getBlob(),
         iconFile = iconBlob ? DriveApp.createFile(iconBlob) : null,
@@ -86,7 +65,7 @@ function setRowHeightAll() {
 
     for (; i <= len; ++i) {
         sheet.setRowHeight(i, CONF.ROW_HEIGHT);
-    } 
+    }
 }
 
 function fetchAllIcon() {
@@ -101,13 +80,13 @@ function fetchAllIcon() {
             setIconUrl(i, iconUrl);
             setIconPreview(i, iconUrl);
         }
-    } 
+    }
 }
 
 function createJSON() {
     var i      = 1,
         values = sheet.getRange(1, 1, sheet.getLastRow(), sheet.getLastColumn()).getValues(),
-        len    = values.length;
+        len    = values.length,
         ret    = [],
         obj    = null;
 
@@ -119,7 +98,27 @@ function createJSON() {
         };
 
         ret.push(obj);
-    } 
+    }
 
     return ret;
+}
+
+function onOpen() {
+    var subMenus = [];
+
+    subMenus.push({name: "fetchAllIcon", functionName: "fetchAllIcon"});
+    subMenus.push({name: "setRowHeight", functionName: "setRowHeightAll"});
+
+    spreadsheet.addMenu("Custom Menu", subMenus);
+}
+
+function doGet(req) {
+    var res = {
+            data : createJSON()
+        },
+        callback = req.parameters.callback ? req.parameters.callback : "callback";
+
+    return ContentService
+            .createTextOutput(callback + "(" + JSON.stringify(res) + ")")
+            .setMimeType(ContentService.MimeType.JSON);
 }
