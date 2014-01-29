@@ -13,8 +13,9 @@ var CONF = {
     },
     // spreadsheet = SpreadsheetApp.getActiveSpreadsheet(),
     // sheet       = SpreadsheetApp.getActiveSheet(),
-    spreadsheet = SpreadsheetApp.openById("0AkiE9r2RNrWhdC11UUFhT2V4WVVwbXVjNHY2WmN2LVE"),
-    sheet       = spreadsheet.getSheetByName("シート1"),
+    sheetId     = ScriptProperties.getProperty("sheet_id"),
+    spreadsheet = SpreadsheetApp.openById(sheetId),
+    sheet       = spreadsheet.getSheets()[0],
     iconIdRegex = /https?:\/\/docs\.google\.com\/file\/d\/(\w+)\/edit/,
     iconBaseUrl = "http://drive.google.com/uc?export=download&id=";
 
@@ -42,6 +43,21 @@ function getIconUrl(row) {
     iconId = iconIdRegex.exec(iconFile.getUrl());
 
     return iconId ? iconBaseUrl + iconId[1] : null;
+}
+
+function getImageBase64(src) {
+    var image = UrlFetchApp.fetch(src),
+        blob, contentType, base64;
+
+    if (!image) {
+        return;
+    }
+
+    blob        = image.getBlob();
+    contentType = blob.getContentType();
+    base64      = Utilities.base64Encode(blob.getBytes());
+
+    return "data:" + contentType + ";base64," + base64;
 }
 
 function setIconUrl(row, url) {
@@ -106,19 +122,40 @@ function createJSON() {
 function onOpen() {
     var subMenus = [];
 
-    subMenus.push({name: "fetchAllIcon", functionName: "fetchAllIcon"});
-    subMenus.push({name: "setRowHeight", functionName: "setRowHeightAll"});
+    subMenus.push({ name : "fetchAllIcon", functionName : "fetchAllIcon"    });
+    subMenus.push({ name : "setRowHeight", functionName : "setRowHeightAll" });
 
     spreadsheet.addMenu("Custom Menu", subMenus);
 }
 
 function doGet(req) {
-    var res = {
-            data : createJSON()
-        },
+    var type = req.parameters.type[0],
+        source, callback, response, mimeType;
+
+    switch (type) {
+    case "base64":
+        source = req.parameters.src;
+
+        if (!source) {
+            return;
+        }
+
+        response = getImageBase64(source);
+        mimeType = "TEXT";
+
+        break;
+    case "json":
+    case "jsonp":
+        /* falls through */
+    default:
         callback = req.parameters.callback ? req.parameters.callback : "callback";
+        response = callback + "(" + JSON.stringify({ data : createJSON() }) + ")";
+        mimeType = "JSON";
+
+        break;
+    }
 
     return ContentService
-            .createTextOutput(callback + "(" + JSON.stringify(res) + ")")
-            .setMimeType(ContentService.MimeType.JSON);
+            .createTextOutput(response)
+            .setMimeType(ContentService.MimeType[mimeType]);
 }
