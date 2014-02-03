@@ -62,6 +62,41 @@ hr {
   visibility: visible;
 }
 
+.debug-log {
+  display: none;
+}
+
+.normal.topic-enable {
+  padding-top: 3.5em;
+}
+.normal.topic-enable #topic {
+  display: block;
+}
+
+#topic {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  width: 100%;
+  padding: 0.75em 0;
+  border-bottom: 1px solid #dddddd;
+  background-color: #eeeeee;
+  color: #505050;
+  line-height: 1.2em;
+  font-weight: bold;
+  text-align: center;
+}
+#topic .url {
+  padding: 0 1em;
+  color: #505050;
+  text-decoration: none;
+}
+#topic .url:hover {
+  text-decoration: underline;
+}
+
 .time {
   float: right;
   color: #8c8c8c;
@@ -91,31 +126,32 @@ hr {
 
 .icon {
   display: inline-block;
-  width: 32px;
-  height: 32px;
-  margin-right: 8px;
-  margin-bottom: 10px;
+  width: 36px;
+  height: 36px;
+  margin-right: 10px;
+  margin-bottom: 8px;
   border: 1px solid #dddddd;
-  -webkit-border-radius: 6px;
-  border-radius: 6px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
   background-repeat: no-repeat;
   background-position: 50% 50%;
-  -webkit-background-size: auto 32px;
-  background-size: auto 32px;
+  -webkit-background-size: auto 100%;
+  background-size: auto 100%;
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABIBAMAAACnw650AAAAFVBMVEX///8AAADAwMCAgID/AADx7+KdnaFGcsumAAAAAXRSTlMAQObYZgAAAFxJREFUeF7t0bENwDAIBVFW8ApeISt4Ba+Q/UeISApEQZToKlv/JLpXILD9O+vmT2RlayChI4WQRb29IaExfDi6lRuMHmUAoZ34nfhbhHrEUEsRlFsCCc26j2j7LhSBcMNVtm00AAAAAElFTkSuQmCC');
   vertical-align: top;
 }
 
 .sender {
   display: inline-block;
-  color: #8c8c8c;
+  color: #333333;
   line-height: 1.2;
-  font-size: 12px;
+  font-size: 13px;
   vertical-align: top;
 }
 .sender:before {
   display: block;
   color: #323232;
-  font-size: 16px;
+  font-size: 18px;
   content: attr(data-screen-name);
 }
 
@@ -146,6 +182,10 @@ hr {
   color: #5c5c5c;
 }
 
+.url {
+  color: #6aa900;
+}
+
 .inlineimage {
   position: relative;
   max-height: 256px;
@@ -156,4 +196,8 @@ hr {
   color: inherit;
   background-color: inherit;
   font-style: italic;
+}
+
+.event .message {
+  display: inline;
 }

@@ -1,33 +1,6 @@
 @import compass
 @import base/_mixin.sass
 
-body
-  margin: 0
-  padding: 1em
-  background-color: #fff
-  color: #505050
-  font-size: 13px
-  font-family: "Helvetica", "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", sans-serif
-  line-height: 1.4
-
-a
-  color: inherit
-
-hr
-  height: 1px
-  margin: 0.5em 2em
-  border: none
-  background-color: transparent
-  // +background-image(radial-gradient(center, ellipse cover, rgba(204, 204, 204, 1) 0%, rgba(204, 204, 204, 0) 100%))
-  +prefix-value(background-image, radial-gradient(center, ellipse cover, rgba(204, 204, 204, 1) 0%, rgba(204, 204, 204, 0) 80%))
-
-.line
-  overflow: hidden
-  position: relative
-
-  &:hover .time
-    visibility: visible
-
 .time
   // display: inline-block
   float: right
@@ -39,7 +12,7 @@ hr
 
 .message
   display: block
-  // margin-left: 42px
+  // margin-left: 46px
 
 .line.first
   margin-top: 12px
@@ -56,29 +29,32 @@ hr
 
 .icon
   display: inline-block
-  width: 32px
-  height: 32px
-  margin-right: 8px
-  margin-bottom: 10px
+  // float: left
+  width: 36px
+  height: 36px
+  margin-right: 10px
+  margin-bottom: 8px
   border: 1px solid #ddd
-  +prefix(border-radius, 6px)
+  // +prefix(border-radius, 6px)
+  +prefix(border-radius, 5px)
   background-repeat: no-repeat
   background-position: 50% 50%
-  +prefix(background-size, auto 32px)
+  +prefix(background-size, auto 100%)
+  background-image: inline-image("notfound.png")
   vertical-align: top
   // opacity: 0
 
 .sender
   display: inline-block
-  color: #8c8c8c
+  color: #333
   line-height: 1.2
-  font-size: 12px
+  font-size: 13px
   vertical-align: top
 
   &:before
     display: block
     color: #323232
-    font-size: 16px
+    font-size: 18px
     content: attr(data-screen-name)
 
 .line.myself
@@ -103,6 +79,9 @@ hr
 
 .message
   color: #5c5c5c
+
+.url
+  color: #6aa900
 
 .inlineimage
   position: relative

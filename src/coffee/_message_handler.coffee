@@ -1,5 +1,7 @@
 class MessageHandler
   constructor: ->
+    @channelTopic = new Views.ChannelTopic()
+
     document.addEventListener "DOMNodeInserted", (event) =>
       @handleMessage event
     , false
@@ -16,24 +18,26 @@ class MessageHandler
       text   : element.querySelector ".message"
 
     switch message.type
-      when "privmsg", "notice"
+      when "privmsg", "notice", "reply", "topic"
         @setAttrs message
+
+    # @setAttrs message
 
   createMemberIcon: (url) ->
     hasCacheImage = do ->
       ret = null
 
-      each cachedImgUrl, (cached) ->
+      each cachedImages, (cached) ->
         if cached.src is url
           return cached
 
       return ret
 
     if hasCacheImage
-      icon     = hasCacheImage.cloneNode false
+      icon = hasCacheImage.cloneNode false
     else
-      icon     = iconBase.cloneNode false
-      icon.src = url
+      icon = iconBase.cloneNode false
+      icon.style.backgroundImage = "url(#{url})"
       icon.addClass "icon"
 
       cachedImages.push icon
@@ -44,19 +48,29 @@ class MessageHandler
     return if target then target.getAttribute("type") or target.getAttribute("_type") else null
 
   setAttrs: (message) ->
+    # console.log "setAttrs"
+
     sender     = message.sender
-    msgType    = @getTypeVal sender
     msgBody    = message.body
-    msgData    = membersList.getMemberData message.id
-    screenName = if msgData then msgData.screen_name else ""
-    iconUrl    = if msgData then msgData.icon_url    else null
+    msgType    = if sender then @getTypeVal sender else @getTypeVal msgBody
+    # msgData    = membersList.getMemberData message.id
+    # screenName = if msgData then msgData.screen_name else ""
+    # iconUrl    = if msgData then msgData.icon_url    else null
+    hasTopic   = (msgType is "reply" or msgType is "topic") and /\s?topic:/i.test message.text.textContent
     isSelf     = msgType is "myself"
-    isFirst    = sender.getAttribute("first") is "true"
+    isFirst    = if sender then sender.getAttribute "first" else false
 
-    if isSelf then msgBody.addClass "myself"
-    if isFirst
-      if iconUrl then msgBody.insertBefore @createMemberIcon(iconUrl), sender
+    # console.log message.text.textContent
+    console.log msgType is "reply" or msgType is "topic"
+    console.log /\s?topic:/i.test(message.text.textContent)
+    console.log hasTopic
 
-      msgBody.addClass "first"
-      sender.setAttribute "data-screen-name", screenName
+    if hasTopic then @channelTopic.update message.text
+    # if isSelf   then msgBody.addClass "myself"
+    # if isFirst
+    #   if iconUrl then msgBody.insertBefore @createMemberIcon(iconUrl), sender
+    #   # if iconUrl then new Views.MemberIcon msgBody, sender, iconUrl
+
+    #   msgBody.addClass "first"
+    #   sender.setAttribute "data-screen-name", screenName
 

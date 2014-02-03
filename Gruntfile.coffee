@@ -80,7 +80,12 @@ module.exports = (grunt) ->
             "src/coffee/_intro.coffee"
             "src/coffee/_CONFIG.coffee"
             "src/coffee/_variable.coffee"
-            "src/coffee/_members_list.coffee"
+            "src/coffee/utils/_debug.coffee"
+            "src/coffee/utils/_function.coffee"
+            "src/coffee/utils/_prototype.coffee"
+            "src/coffee/models/_members_list.coffee"
+            "src/coffee/views/_member_icon.coffee"
+            "src/coffee/views/_channel_topic.coffee"
             "src/coffee/_message_handler.coffee"
             "src/coffee/Sudachi.coffee"
             "src/coffee/_outro.coffee"
@@ -103,8 +108,8 @@ module.exports = (grunt) ->
         ret = { globals: {} }
         opt = ["eqeqeq" , "immed"  , "latedef" , "shadow" , "sub" , "undef" ,
                "boss"   , "eqnull" , "browser" , "devel"  , "loopfunc"]
-        ns  = ["SpreadsheetApp" , "DriveApp" , "UrlFetchApp",
-               "ContentService" , "Browser"]
+        ns  = ["SpreadsheetApp" , "DriveApp" , "UrlFetchApp" , "ScriptProperties"
+               "ContentService" , "Browser"  , "Utilities"]
 
         for o in opt then ret[o]         = true
         for n in ns  then ret.globals[n] = true

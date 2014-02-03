@@ -1,17 +1,32 @@
 (function (global, document, undefined) {
 var NS = "Sudachi";
-var JSON_PATH, MembersList, MessageHandler, body, cachedImages, each, iconBase, membersList, messageHandler,
+var ChannelTopic, JSON_PATH, MemberIcon, MembersList, MessageHandler, Models, Utils, Views, anchorBase, body, cachedImages, debugObject, each, iconBase, membersList, messageHandler,
   _this = this;
+
+Models = Views = Utils = {};
 
 JSON_PATH = "https://script.google.com/macros/s/AKfycbzUiWREKXLygBAKA0Dnx1toN5RcxRPrs6OTKiJpUcoCWBkwFEHz/exec";
 
 body = document.body;
 
-iconBase = new Image();
+iconBase = document.createElement("div");
+
+anchorBase = document.createElement("a");
 
 cachedImages = [];
 
 messageHandler = membersList = null;
+
+debugObject = document.createElement("pre");
+
+debugObject.className = "debug-log";
+
+console.log = function(obj) {
+  var log;
+  log = debugObject.cloneNode(false);
+  log.innerText = typeof obj === "string" ? obj : JSON.stringify(obj);
+  return body.appendChild(log);
+};
 
 each = function(collection, iterator) {
   var ary, i, key, len, _results, _results1;
@@ -62,12 +77,13 @@ MembersList = (function() {
     var script,
       _this = this;
     script = document.createElement("script");
-    global["callback"] = function(res) {
+    global.callback = function(res) {
       _this.data = res.data;
-      body.removeChild(script);
       if (callback) {
-        return callback();
+        callback();
       }
+      body.removeChild(script);
+      return global.callback = null;
     };
     script.async = true;
     script.src = url;
@@ -78,12 +94,12 @@ MembersList = (function() {
     var ret,
       _this = this;
     ret = null;
-    each(this.data, function(data) {
-      if (id === data.id) {
+    each(this.data, function(member) {
+      if (id === member.id) {
         return ret = {
-          id: data.id,
-          screen_name: data.screen_name,
-          icon_url: data.icon_url
+          "id": member.id,
+          "screen_name": member.screen_name,
+          "icon_url": member.icon_url
         };
       }
     });
@@ -94,9 +110,68 @@ MembersList = (function() {
 
 })();
 
+Models.MembersList = MembersList;
+
+MemberIcon = (function() {
+  function MemberIcon(body, sender, url) {
+    this.icon = iconBase.cloneNode(false);
+    this.icon.style.backgroundImage = "url(" + url + ")";
+    this.icon.addClass("icon");
+    this.append(body, sender);
+  }
+
+  MemberIcon.prototype.append = function(body, sender) {
+    body.insertBefore(this.icon, sender);
+    return this.destory();
+  };
+
+  MemberIcon.prototype.destory = function() {};
+
+  return MemberIcon;
+
+})();
+
+Views.MemberIcon = MemberIcon;
+
+ChannelTopic = (function() {
+  function ChannelTopic() {
+    this.element = document.createElement("div");
+    this.element.id = "topic";
+    body.appendChild(this.element);
+    console.log("ChannelTopic Init");
+  }
+
+  ChannelTopic.prototype.clean = function() {
+    return this.element.innerHTML = "";
+  };
+
+  ChannelTopic.prototype.update = function(text) {
+    var anchor, link, url;
+    this.clean();
+    link = text.querySelector("a.url");
+    url = link ? link.textContent : null;
+    if (url) {
+      anchor = anchorBase.cloneNode(false);
+      anchor.className = "url";
+      anchor.href = anchor.innerText = url;
+      anchor.setAttribute("oncontextmenu", "on_url()");
+      this.element.appendChild(anchor);
+    } else {
+      this.element.innerText = text.textContent.replace(/^[\w|\s]+?\s?topic:\s/i, "");
+    }
+    return body.addClass("topic-enable");
+  };
+
+  return ChannelTopic;
+
+})();
+
+Views.ChannelTopic = ChannelTopic;
+
 MessageHandler = (function() {
   function MessageHandler() {
     var _this = this;
+    this.channelTopic = new Views.ChannelTopic();
     document.addEventListener("DOMNodeInserted", function(event) {
       return _this.handleMessage(event);
     }, false);
@@ -117,6 +192,8 @@ MessageHandler = (function() {
     switch (message.type) {
       case "privmsg":
       case "notice":
+      case "reply":
+      case "topic":
         return this.setAttrs(message);
     }
   };
@@ -126,7 +203,7 @@ MessageHandler = (function() {
     hasCacheImage = (function() {
       var ret;
       ret = null;
-      each(cachedImgUrl, function(cached) {
+      each(cachedImages, function(cached) {
         if (cached.src === url) {
           return cached;
         }
@@ -137,7 +214,7 @@ MessageHandler = (function() {
       icon = hasCacheImage.cloneNode(false);
     } else {
       icon = iconBase.cloneNode(false);
-      icon.src = url;
+      icon.style.backgroundImage = "url(" + url + ")";
       icon.addClass("icon");
       cachedImages.push(icon);
     }
@@ -153,24 +230,18 @@ MessageHandler = (function() {
   };
 
   MessageHandler.prototype.setAttrs = function(message) {
-    var iconUrl, isFirst, isSelf, msgBody, msgData, msgType, screenName, sender;
+    var hasTopic, isFirst, isSelf, msgBody, msgType, sender;
     sender = message.sender;
-    msgType = this.getTypeVal(sender);
     msgBody = message.body;
-    msgData = membersList.getMemberData(message.id);
-    screenName = msgData ? msgData.screen_name : "";
-    iconUrl = msgData ? msgData.icon_url : null;
+    msgType = sender ? this.getTypeVal(sender) : this.getTypeVal(msgBody);
+    hasTopic = (msgType === "reply" || msgType === "topic") && /\s?topic:/i.test(message.text.textContent);
     isSelf = msgType === "myself";
-    isFirst = sender.getAttribute("first") === "true";
-    if (isSelf) {
-      msgBody.addClass("myself");
-    }
-    if (isFirst) {
-      if (iconUrl) {
-        msgBody.insertBefore(this.createMemberIcon(iconUrl), sender);
-      }
-      msgBody.addClass("first");
-      return sender.setAttribute("data-screen-name", screenName);
+    isFirst = sender ? sender.getAttribute("first") : false;
+    console.log(msgType === "reply" || msgType === "topic");
+    console.log(/\s?topic:/i.test(message.text.textContent));
+    console.log(hasTopic);
+    if (hasTopic) {
+      return this.channelTopic.update(message.text);
     }
   };
 

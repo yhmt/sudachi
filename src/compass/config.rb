@@ -8,9 +8,9 @@ relative_assets  = false
 # Asset へのディレクトリパス (project_path からの相対パスで指定)
 sass_dir        = "src/compass"
 css_dir         = "./"
-images_dir      = "img/"
-javascripts_dir = "js/"
-fonts_dir       = "fonts/"
+images_dir      = "src/images"
+javascripts_dir = "./"
+fonts_dir       = "src/fonts"
 
 # Web サーバー上でのディレクトリパス
 http_path             = "/"
