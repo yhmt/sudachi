@@ -1,10 +1,12 @@
 class ChannelTopic
   constructor: ->
-    @anchorBase = document.createElement "a"
-    @element    = document.createElement "div"
-    @element.id = "topic-bar"
+    @anchorBase  = document.createElement "a"
+    @element     = document.createElement "p"
+    @topicbar    = document.createElement "div"
+    @topicbar.id = "topic-bar"
 
-    body.appendChild @element
+    @topicbar.appendChild @element
+    body.appendChild @topicbar
 
   clean: ->
     @element.innerHTML = ""

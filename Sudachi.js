@@ -128,9 +128,11 @@ Views.MemberIcon = MemberIcon;
 ChannelTopic = (function() {
   function ChannelTopic() {
     this.anchorBase = document.createElement("a");
-    this.element = document.createElement("div");
-    this.element.id = "topic-bar";
-    body.appendChild(this.element);
+    this.element = document.createElement("p");
+    this.topicbar = document.createElement("div");
+    this.topicbar.id = "topic-bar";
+    this.topicbar.appendChild(this.element);
+    body.appendChild(this.topicbar);
   }
 
   ChannelTopic.prototype.clean = function() {

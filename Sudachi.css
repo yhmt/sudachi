@@ -78,9 +78,15 @@ hr {
   padding: 0.75em 0;
   border-bottom-width: 1px;
   border-bottom-style: solid;
+  text-align: center;
+}
+#topic-bar p {
+  overflow: hidden;
+  margin: 0 0.5em;
   line-height: 1.2em;
   font-weight: bold;
-  text-align: center;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 #topic-bar .url {
   padding: 0 1em;
@@ -123,8 +129,11 @@ hr,
 .myself .sender:before {
   color: #007600;
 }
-.myself .message {
+.myself.privmsg .message {
   color: #00960f;
+}
+.myself.notice .message {
+  color: rgba(0, 150, 15, 0.66);
 }
 
 .icon {

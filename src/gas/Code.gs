@@ -129,7 +129,7 @@ function onOpen() {
 }
 
 function doGet(req) {
-    var type = req.parameters.type[0],
+    var type = req.parameters.type ? req.parameters.type[0] || req.parameters.type : null,
         source, callback, response, mimeType;
 
     switch (type) {
