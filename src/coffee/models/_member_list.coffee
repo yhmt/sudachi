@@ -1,4 +1,4 @@
-class MembersList
+class MemberList
   constructor: (url, callback) ->
     @data = null
 
@@ -31,4 +31,4 @@ class MembersList
 
     return ret
 
-Models.MembersList = MembersList
+Models.MemberList = MemberList

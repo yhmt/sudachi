@@ -1,23 +1,23 @@
-each = (collection, iterator) ->
-  i   = 0
-  len = ary = key = undefined
+`
+var each = function(collection, iterator) {
+    var i = 0,
+        len, ary, key;
 
-  if Array.isArray collection
-    len = collection.length
+    if (Array.isArray(collection)) {
+        len = collection.length;
 
-    while len
-      iterator collection[i], i
+        for (; len; ++i, --len) {
+            iterator(collection[i], i);
+        }
+    }
+    else {
+        ary = Object.keys(collection);
+        len = ary.length;
 
-      ++i
-      --len
-
-  else
-    ary = Object.keys collection
-    len = ary.length
-
-    while len
-      key = ary[i]
-      iterator key, collection[key]
-
-      ++i
-      --len
+        for (; len; ++i, --len) {
+            key = ary[i];
+            iterator(key, collection[key]);
+        }
+    }
+}
+`

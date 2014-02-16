@@ -1,10 +1,10 @@
 class ChannelTopic
   constructor: ->
+    @anchorBase = document.createElement "a"
     @element    = document.createElement "div"
-    @element.id = "topic"
+    @element.id = "topic-bar"
 
     body.appendChild @element
-    console.log "ChannelTopic Init"
 
   clean: ->
     @element.innerHTML = ""
@@ -16,7 +16,7 @@ class ChannelTopic
     url  = if link then link.textContent else null
 
     if url
-      anchor           = anchorBase.cloneNode false
+      anchor           = @anchorBase.cloneNode false
       anchor.className = "url"
       anchor.href      =
       anchor.innerText = url

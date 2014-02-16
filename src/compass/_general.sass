@@ -4,10 +4,8 @@
 body
   margin: 0
   padding: 1em
-  background-color: #fff
-  color: #505050
   font-size: 13px
-  font-family: "Helvetica", "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", sans-serif
+  font-family: "Helvetica", sans-serif
   line-height: 1.4
 
 a
@@ -18,8 +16,6 @@ hr
   margin: 0.5em 2em
   border: none
   background-color: transparent
-  // +background-image(radial-gradient(center, ellipse cover, rgba(204, 204, 204, 1) 0%, rgba(204, 204, 204, 0) 100%))
-  +prefix-value(background-image, radial-gradient(center, ellipse cover, rgba(204, 204, 204, 1) 0%, rgba(204, 204, 204, 0) 80%))
 
 .line
   overflow: hidden
@@ -34,10 +30,10 @@ hr
 .normal.topic-enable
   padding-top: 3.5em
 
-  #topic
+  #topic-bar
     display: block
 
-#topic
+#topic-bar
   display: none
   position: fixed
   top: 0
@@ -45,16 +41,14 @@ hr
   z-index: 999
   width: 100%
   padding: 0.75em 0
-  border-bottom: 1px solid #ddd
-  background-color: #eee
-  color: #505050
+  border-bottom-width: 1px
+  border-bottom-style: solid
   line-height: 1.2em
   font-weight: bold
   text-align: center
 
   .url
     padding: 0 1em
-    color: #505050
     text-decoration: none
 
   .url:hover

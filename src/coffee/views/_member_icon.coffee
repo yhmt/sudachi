@@ -1,15 +1,16 @@
 class MemberIcon
-  constructor: (body, sender, url) ->
-    @icon = iconBase.cloneNode false
-    @icon.style.backgroundImage = "url(#{url})"
-    @icon.addClass "icon"
+  constructor: (model) ->
+    @model    = model
+    @iconBase = document.createElement "div"
 
-    @append body, sender
+  append: (data, parentElement, referenceElement) ->
+    unless data or parentElement or referenceElement then return
 
-  append: (body, sender) ->
-    body.insertBefore @icon, sender
+    icon = @iconBase.cloneNode false
+    icon.style.backgroundImage = "url(#{data.icon_url})"
+    icon.addClass "icon"
 
-    @destory()
+    parentElement.insertBefore icon, referenceElement
 
   destory: ->
     # @ = null

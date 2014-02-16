@@ -1,21 +1,12 @@
 (function (global, document, undefined) {
 var NS = "Sudachi";
-var ChannelTopic, JSON_PATH, MemberIcon, MembersList, MessageHandler, Models, Utils, Views, anchorBase, body, cachedImages, debugObject, each, iconBase, membersList, messageHandler,
-  _this = this;
+var ChannelTopic, JSON_URL, MemberIcon, MemberList, MessageHandler, Models, Utils, Views, body, debugObject, messageHandler;
 
 Models = Views = Utils = {};
 
-JSON_PATH = "https://script.google.com/macros/s/AKfycbzUiWREKXLygBAKA0Dnx1toN5RcxRPrs6OTKiJpUcoCWBkwFEHz/exec";
+JSON_URL = "https://script.google.com/macros/s/AKfycbzUiWREKXLygBAKA0Dnx1toN5RcxRPrs6OTKiJpUcoCWBkwFEHz/exec";
 
 body = document.body;
-
-iconBase = document.createElement("div");
-
-anchorBase = document.createElement("a");
-
-cachedImages = [];
-
-messageHandler = membersList = null;
 
 debugObject = document.createElement("pre");
 
@@ -28,32 +19,29 @@ console.log = function(obj) {
   return body.appendChild(log);
 };
 
-each = function(collection, iterator) {
-  var ary, i, key, len, _results, _results1;
-  i = 0;
-  len = ary = key = void 0;
-  if (Array.isArray(collection)) {
-    len = collection.length;
-    _results = [];
-    while (len) {
-      iterator(collection[i], i);
-      ++i;
-      _results.push(--len);
+
+var each = function(collection, iterator) {
+    var i = 0,
+        len, ary, key;
+
+    if (Array.isArray(collection)) {
+        len = collection.length;
+
+        for (; len; ++i, --len) {
+            iterator(collection[i], i);
+        }
     }
-    return _results;
-  } else {
-    ary = Object.keys(collection);
-    len = ary.length;
-    _results1 = [];
-    while (len) {
-      key = ary[i];
-      iterator(key, collection[key]);
-      ++i;
-      _results1.push(--len);
+    else {
+        ary = Object.keys(collection);
+        len = ary.length;
+
+        for (; len; ++i, --len) {
+            key = ary[i];
+            iterator(key, collection[key]);
+        }
     }
-    return _results1;
-  }
-};
+}
+;
 
 Element.prototype.hasClass = function(klass) {
   return this.classList.contains(klass);
@@ -67,13 +55,13 @@ Element.prototype.removeClass = function(klass) {
   return this.classList.remove(klass);
 };
 
-MembersList = (function() {
-  function MembersList(url, callback) {
+MemberList = (function() {
+  function MemberList(url, callback) {
     this.data = null;
     this.fetchJSON(url, callback);
   }
 
-  MembersList.prototype.fetchJSON = function(url, callback) {
+  MemberList.prototype.fetchJSON = function(url, callback) {
     var script,
       _this = this;
     script = document.createElement("script");
@@ -90,7 +78,7 @@ MembersList = (function() {
     return body.appendChild(script);
   };
 
-  MembersList.prototype.getMemberData = function(id) {
+  MemberList.prototype.getMemberData = function(id) {
     var ret,
       _this = this;
     ret = null;
@@ -106,23 +94,27 @@ MembersList = (function() {
     return ret;
   };
 
-  return MembersList;
+  return MemberList;
 
 })();
 
-Models.MembersList = MembersList;
+Models.MemberList = MemberList;
 
 MemberIcon = (function() {
-  function MemberIcon(body, sender, url) {
-    this.icon = iconBase.cloneNode(false);
-    this.icon.style.backgroundImage = "url(" + url + ")";
-    this.icon.addClass("icon");
-    this.append(body, sender);
+  function MemberIcon(model) {
+    this.model = model;
+    this.iconBase = document.createElement("div");
   }
 
-  MemberIcon.prototype.append = function(body, sender) {
-    body.insertBefore(this.icon, sender);
-    return this.destory();
+  MemberIcon.prototype.append = function(data, parentElement, referenceElement) {
+    var icon;
+    if (!(data || parentElement || referenceElement)) {
+      return;
+    }
+    icon = this.iconBase.cloneNode(false);
+    icon.style.backgroundImage = "url(" + data.icon_url + ")";
+    icon.addClass("icon");
+    return parentElement.insertBefore(icon, referenceElement);
   };
 
   MemberIcon.prototype.destory = function() {};
@@ -135,10 +127,10 @@ Views.MemberIcon = MemberIcon;
 
 ChannelTopic = (function() {
   function ChannelTopic() {
+    this.anchorBase = document.createElement("a");
     this.element = document.createElement("div");
-    this.element.id = "topic";
+    this.element.id = "topic-bar";
     body.appendChild(this.element);
-    console.log("ChannelTopic Init");
   }
 
   ChannelTopic.prototype.clean = function() {
@@ -151,7 +143,7 @@ ChannelTopic = (function() {
     link = text.querySelector("a.url");
     url = link ? link.textContent : null;
     if (url) {
-      anchor = anchorBase.cloneNode(false);
+      anchor = this.anchorBase.cloneNode(false);
       anchor.className = "url";
       anchor.href = anchor.innerText = url;
       anchor.setAttribute("oncontextmenu", "on_url()");
@@ -172,56 +164,15 @@ MessageHandler = (function() {
   function MessageHandler() {
     var _this = this;
     this.channelTopic = new Views.ChannelTopic();
+    this.membersList = new Models.MemberList(JSON_URL, function() {
+      return _this.memberIcon = new Views.MemberIcon(_this.membersList);
+    });
     document.addEventListener("DOMNodeInserted", function(event) {
-      return _this.handleMessage(event);
+      return _this.handleDOMNodeInsert(event);
     }, false);
   }
 
-  MessageHandler.prototype.handleMessage = function(event) {
-    var element, message;
-    element = event.target;
-    message = {
-      body: element,
-      type: this.getTypeVal(element),
-      id: element.getAttribute("nick"),
-      time: element.querySelector(".time"),
-      place: element.querySelector(".place"),
-      sender: element.querySelector(".sender"),
-      text: element.querySelector(".message")
-    };
-    switch (message.type) {
-      case "privmsg":
-      case "notice":
-      case "reply":
-      case "topic":
-        return this.setAttrs(message);
-    }
-  };
-
-  MessageHandler.prototype.createMemberIcon = function(url) {
-    var hasCacheImage, icon;
-    hasCacheImage = (function() {
-      var ret;
-      ret = null;
-      each(cachedImages, function(cached) {
-        if (cached.src === url) {
-          return cached;
-        }
-      });
-      return ret;
-    })();
-    if (hasCacheImage) {
-      icon = hasCacheImage.cloneNode(false);
-    } else {
-      icon = iconBase.cloneNode(false);
-      icon.style.backgroundImage = "url(" + url + ")";
-      icon.addClass("icon");
-      cachedImages.push(icon);
-    }
-    return icon;
-  };
-
-  MessageHandler.prototype.getTypeVal = function(target) {
+  MessageHandler.prototype.getTypeValue = function(target) {
     if (target) {
       return target.getAttribute("type") || target.getAttribute("_type");
     } else {
@@ -229,19 +180,53 @@ MessageHandler = (function() {
     }
   };
 
-  MessageHandler.prototype.setAttrs = function(message) {
-    var hasTopic, isFirst, isSelf, msgBody, msgType, sender;
-    sender = message.sender;
-    msgBody = message.body;
-    msgType = sender ? this.getTypeVal(sender) : this.getTypeVal(msgBody);
-    hasTopic = (msgType === "reply" || msgType === "topic") && /\s?topic:/i.test(message.text.textContent);
-    isSelf = msgType === "myself";
-    isFirst = sender ? sender.getAttribute("first") : false;
-    console.log(msgType === "reply" || msgType === "topic");
-    console.log(/\s?topic:/i.test(message.text.textContent));
-    console.log(hasTopic);
+  MessageHandler.prototype.handleDOMNodeInsert = function(event) {
+    var element, message;
+    element = event.target;
+    message = {
+      body: element,
+      type: this.getTypeValue(element),
+      id: element.getAttribute("nick"),
+      time: element.querySelector(".time"),
+      place: element.querySelector(".place"),
+      sender: element.querySelector(".sender"),
+      text: element.querySelector(".message")
+    };
+    switch (message.type) {
+      case "reply":
+      case "topic":
+        return this.handleTopic(message);
+      case "privmsg":
+      case "notice":
+        return this.handleMessage(message);
+    }
+  };
+
+  MessageHandler.prototype.handleTopic = function(message) {
+    var hasTopic, topicRe;
+    topicRe = /\s?topic:\s?.+/i;
+    hasTopic = topicRe.test(message.text.textContent);
     if (hasTopic) {
       return this.channelTopic.update(message.text);
+    }
+  };
+
+  MessageHandler.prototype.handleMessage = function(message) {
+    var isFirst, isSelf, msgBody, msgData, msgSender, msgType, screenName;
+    msgSender = message.sender;
+    msgBody = message.body;
+    msgType = msgSender ? this.getTypeValue(msgSender) : this.getTypeValue(msgBody);
+    msgData = this.membersList ? this.membersList.getMemberData(message.id) : null;
+    screenName = msgData ? msgData.screen_name : "";
+    isSelf = msgType === "myself";
+    isFirst = msgSender && msgSender.getAttribute("first") === "true" ? true : false;
+    if (isSelf) {
+      msgBody.addClass("myself");
+    }
+    if (isFirst) {
+      this.memberIcon.append(msgData, msgBody, msgSender);
+      msgBody.addClass("first");
+      return msgSender.setAttribute("data-screen-name", screenName);
     }
   };
 
@@ -249,12 +234,6 @@ MessageHandler = (function() {
 
 })();
 
-membersList = new MembersList(JSON_PATH, function() {
-  messageHandler = new MessageHandler();
-  return global[NS] = {
-    "messageHandler": messageHandler,
-    "membersList": membersList
-  };
-});
+messageHandler = new MessageHandler();
 
 })(this, this.document);

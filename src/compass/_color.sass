@@ -1,0 +1,43 @@
+@import compass
+
+body
+  background-color: #fff
+  color: #505050
+
+hr,
+.line.first:before
+  +prefix-value(background-image, radial-gradient(center, ellipse cover, rgba(204, 204, 204, 1) 0%, rgba(204, 204, 204, 0) 80%))
+
+.time
+  color: #8c8c8c
+
+.sender
+  color: #333
+.sender:before
+  color: #323232
+
+.message
+  color: #5c5c5c
+
+.myself
+  .sender
+    color: #70bb72
+  .sender:before
+    color: #007600
+
+  .message
+    color: #00960f
+
+.icon
+  border-color: #ddd
+
+.url
+  color: #6aa900
+
+#topic-bar
+  border-bottom-color: #ddd
+  background-color: #eee
+  color: #505050
+
+  .url
+    color: #505050

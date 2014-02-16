@@ -83,7 +83,7 @@ module.exports = (grunt) ->
             "src/coffee/utils/_debug.coffee"
             "src/coffee/utils/_function.coffee"
             "src/coffee/utils/_prototype.coffee"
-            "src/coffee/models/_members_list.coffee"
+            "src/coffee/models/_member_list.coffee"
             "src/coffee/views/_member_icon.coffee"
             "src/coffee/views/_channel_topic.coffee"
             "src/coffee/_message_handler.coffee"
