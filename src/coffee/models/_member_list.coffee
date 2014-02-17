@@ -19,15 +19,15 @@ class MemberList
 
     body.appendChild script
 
-  getMemberData: (id) ->
+  getMemberData: (nick) ->
     ret = null
 
     each @data, (member) =>
-      if id is member.id
+      if nick is member.nick
         ret =
-          "id"          : member.id
-          "screen_name" : member.screen_name
-          "icon_url"    : member.icon_url
+          "nick"     : member.nick
+          "name"     : member.name
+          "icon_url" : member.icon_url
 
     return ret
 

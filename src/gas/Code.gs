@@ -5,8 +5,8 @@ var CONF = {
         ROW_HEIGHT  : 32
     },
     CELL = {
-        ID            : 1,
-        SCREEN_NAME   : 2,
+        NICK          : 1,
+        NAME          : 2,
         ICON_URL      : 3,
         ICON_PREVIEW  : 4,
         ORIGINAL_ICON : 5
@@ -25,7 +25,7 @@ function getIconUrl(row) {
     }
 
     var folder   = DriveApp.getFoldersByName(CONF.FOLDER_NAME).next(),
-        userId   = sheet.getRange(row, CELL.ID).getValue(),
+        userId   = sheet.getRange(row, CELL.NICK).getValue(),
         origIcon = sheet.getRange(row, CELL.ORIGINAL_ICON).getValue(),
         iconBlob = UrlFetchApp.fetch(origIcon).getBlob(),
         iconFile = iconBlob ? DriveApp.createFile(iconBlob) : null,
@@ -108,9 +108,9 @@ function createJSON() {
 
     for (; i < len; ++i) {
         obj = {
-            "id"          : values[i][0],
-            "screen_name" : values[i][1],
-            "icon_url"    : values[i][2]
+            "nick"     : values[i][0],
+            "name"     : values[i][1],
+            "icon_url" : values[i][2]
         };
 
         ret.push(obj);

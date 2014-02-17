@@ -78,15 +78,15 @@ MemberList = (function() {
     return body.appendChild(script);
   };
 
-  MemberList.prototype.getMemberData = function(id) {
+  MemberList.prototype.getMemberData = function(nick) {
     var ret,
       _this = this;
     ret = null;
     each(this.data, function(member) {
-      if (id === member.id) {
+      if (nick === member.nick) {
         return ret = {
-          "id": member.id,
-          "screen_name": member.screen_name,
+          "nick": member.nick,
+          "name": member.name,
           "icon_url": member.icon_url
         };
       }
@@ -188,7 +188,7 @@ MessageHandler = (function() {
     message = {
       body: element,
       type: this.getTypeValue(element),
-      id: element.getAttribute("nick"),
+      nick: element.getAttribute("nick"),
       time: element.querySelector(".time"),
       place: element.querySelector(".place"),
       sender: element.querySelector(".sender"),
@@ -218,7 +218,7 @@ MessageHandler = (function() {
     msgSender = message.sender;
     msgBody = message.body;
     msgType = msgSender ? this.getTypeValue(msgSender) : this.getTypeValue(msgBody);
-    msgData = this.membersList ? this.membersList.getMemberData(message.id) : null;
+    msgData = this.membersList ? this.membersList.getMemberData(message.nick) : null;
     isSelf = msgType === "myself";
     isFirst = msgSender && msgSender.getAttribute("first") === "true" ? true : false;
     if (isSelf) {

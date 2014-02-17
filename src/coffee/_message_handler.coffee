@@ -16,7 +16,7 @@ class MessageHandler
     message =
       body   : element
       type   : @getTypeValue element
-      id     : element.getAttribute  "nick"
+      nick   : element.getAttribute  "nick"
       time   : element.querySelector ".time"
       place  : element.querySelector ".place"
       sender : element.querySelector ".sender"
@@ -40,7 +40,7 @@ class MessageHandler
     msgSender = message.sender
     msgBody   = message.body
     msgType   = if msgSender then @getTypeValue msgSender else @getTypeValue msgBody
-    msgData   = if @membersList then @membersList.getMemberData message.id else null
+    msgData   = if @membersList then @membersList.getMemberData message.nick else null
     isSelf    = msgType is "myself"
     isFirst   = if msgSender and msgSender.getAttribute("first") is "true" then true else false
 
