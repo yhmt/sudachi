@@ -37,18 +37,17 @@ class MessageHandler
       @channelTopic.update message.text
 
   handleMessage: (message) ->
-    msgSender  = message.sender
-    msgBody    = message.body
-    msgType    = if msgSender then @getTypeValue msgSender else @getTypeValue msgBody
-    msgData    = if @membersList then @membersList.getMemberData message.id else null
-    screenName = if msgData then msgData.screen_name else ""
-
-    isSelf  = msgType is "myself"
-    isFirst = if msgSender and msgSender.getAttribute("first") is "true" then true else false
+    msgSender = message.sender
+    msgBody   = message.body
+    msgType   = if msgSender then @getTypeValue msgSender else @getTypeValue msgBody
+    msgData   = if @membersList then @membersList.getMemberData message.id else null
+    isSelf    = msgType is "myself"
+    isFirst   = if msgSender and msgSender.getAttribute("first") is "true" then true else false
 
     if isSelf then msgBody.addClass "myself"
     if isFirst
-      @memberIcon.append msgData, msgBody, msgSender
-
       msgBody.addClass "first"
-      msgSender.setAttribute "data-screen-name", screenName
+
+      if msgData
+        @memberIcon.append msgData, msgBody, msgSender
+        msgSender.setAttribute "data-screen-name", msgData.screen_name

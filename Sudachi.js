@@ -214,21 +214,22 @@ MessageHandler = (function() {
   };
 
   MessageHandler.prototype.handleMessage = function(message) {
-    var isFirst, isSelf, msgBody, msgData, msgSender, msgType, screenName;
+    var isFirst, isSelf, msgBody, msgData, msgSender, msgType;
     msgSender = message.sender;
     msgBody = message.body;
     msgType = msgSender ? this.getTypeValue(msgSender) : this.getTypeValue(msgBody);
     msgData = this.membersList ? this.membersList.getMemberData(message.id) : null;
-    screenName = msgData ? msgData.screen_name : "";
     isSelf = msgType === "myself";
     isFirst = msgSender && msgSender.getAttribute("first") === "true" ? true : false;
     if (isSelf) {
       msgBody.addClass("myself");
     }
     if (isFirst) {
-      this.memberIcon.append(msgData, msgBody, msgSender);
       msgBody.addClass("first");
-      return msgSender.setAttribute("data-screen-name", screenName);
+      if (msgData) {
+        this.memberIcon.append(msgData, msgBody, msgSender);
+        return msgSender.setAttribute("data-screen-name", msgData.screen_name);
+      }
     }
   };
 
