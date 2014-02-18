@@ -166,8 +166,8 @@ MessageHandler = (function() {
   function MessageHandler() {
     var _this = this;
     this.channelTopic = new Views.ChannelTopic();
-    this.membersList = new Models.MemberList(JSON_URL, function() {
-      return _this.memberIcon = new Views.MemberIcon(_this.membersList);
+    this.memberList = new Models.MemberList(JSON_URL, function() {
+      return _this.memberIcon = new Views.MemberIcon(_this.memberList);
     });
     document.addEventListener("DOMNodeInserted", function(event) {
       return _this.handleDOMNodeInsert(event);
@@ -218,7 +218,7 @@ MessageHandler = (function() {
     msgSender = message.sender;
     msgBody = message.body;
     msgType = msgSender ? this.getTypeValue(msgSender) : this.getTypeValue(msgBody);
-    msgData = this.membersList ? this.membersList.getMemberData(message.nick) : null;
+    msgData = this.memberList ? this.memberList.getMemberData(message.nick) : null;
     isSelf = msgType === "myself";
     isFirst = msgSender && msgSender.getAttribute("first") === "true" ? true : false;
     if (isSelf) {
@@ -228,7 +228,7 @@ MessageHandler = (function() {
       msgBody.addClass("first");
       if (msgData) {
         this.memberIcon.append(msgData, msgBody, msgSender);
-        return msgSender.setAttribute("data-screen-name", msgData.screen_name);
+        return msgSender.setAttribute("data-name", msgData.name);
       }
     }
   };

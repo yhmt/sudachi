@@ -1,8 +1,8 @@
 class MessageHandler
   constructor: ->
     @channelTopic = new Views.ChannelTopic()
-    @membersList  = new Models.MemberList JSON_URL, =>
-      @memberIcon = new Views.MemberIcon @membersList
+    @memberList   = new Models.MemberList JSON_URL, =>
+      @memberIcon = new Views.MemberIcon @memberList
 
     document.addEventListener "DOMNodeInserted", (event) =>
       @handleDOMNodeInsert event
@@ -40,7 +40,7 @@ class MessageHandler
     msgSender = message.sender
     msgBody   = message.body
     msgType   = if msgSender then @getTypeValue msgSender else @getTypeValue msgBody
-    msgData   = if @membersList then @membersList.getMemberData message.nick else null
+    msgData   = if @memberList then @memberList.getMemberData message.nick else null
     isSelf    = msgType is "myself"
     isFirst   = if msgSender and msgSender.getAttribute("first") is "true" then true else false
 
@@ -50,4 +50,4 @@ class MessageHandler
 
       if msgData
         @memberIcon.append msgData, msgBody, msgSender
-        msgSender.setAttribute "data-screen-name", msgData.screen_name
+        msgSender.setAttribute "data-name", msgData.name
