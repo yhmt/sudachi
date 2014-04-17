@@ -31,72 +31,6 @@ hr {
 }
 
 body {
-  margin: 0;
-  padding: 1em;
-  font-size: 13px;
-  font-family: "Helvetica", sans-serif;
-  line-height: 1.4;
-}
-
-a {
-  color: inherit;
-}
-
-hr {
-  height: 1px;
-  margin: 0.5em 2em;
-  border: none;
-  background-color: transparent;
-}
-
-.line {
-  overflow: hidden;
-  position: relative;
-}
-.line:hover .time {
-  visibility: visible;
-}
-
-.debug-log {
-  display: none;
-}
-
-.normal.topic-enable {
-  padding-top: 3.5em;
-}
-.normal.topic-enable #topic-bar {
-  display: block;
-}
-
-#topic-bar {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 999;
-  width: 100%;
-  padding: 0.75em 0;
-  border-bottom-width: 1px;
-  border-bottom-style: solid;
-  text-align: center;
-}
-#topic-bar p {
-  overflow: hidden;
-  margin: 0 0.5em;
-  line-height: 1.2;
-  font-family: "Lucida Grande", "AquaKana", sans-serif;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-#topic-bar .url {
-  padding: 0 1em;
-  text-decoration: none;
-}
-#topic-bar .url:hover {
-  text-decoration: underline;
-}
-
-body {
   background-color: white;
   color: #505050;
 }
@@ -153,6 +87,71 @@ hr,
   color: #505050;
 }
 
+body {
+  margin: 0;
+  padding: 1em;
+  font-size: 13px;
+  font-family: "Helvetica", sans-serif;
+  line-height: 1.4;
+}
+
+a {
+  color: inherit;
+}
+
+hr {
+  height: 1px;
+  margin: 0.5em 2em;
+  border: none;
+  background-color: transparent;
+}
+
+.line {
+  overflow: hidden;
+  position: relative;
+}
+.line:hover .time {
+  visibility: visible;
+}
+
+.debug-log {
+  display: none;
+}
+
+#topic-bar {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  width: 100%;
+  padding: 0.75em 0;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  text-align: center;
+}
+#topic-bar p {
+  overflow: hidden;
+  margin: 0 0.5em;
+  font-family: "Lucida Grande", "AquaKana", sans-serif;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+#topic-bar .url {
+  padding: 0 1em;
+  text-decoration: none;
+}
+#topic-bar .url:hover {
+  text-decoration: underline;
+}
+
+.topic-enable {
+  padding-top: 3.5em;
+}
+.topic-enable #topic-bar {
+  display: block;
+}
+
 .time {
   float: right;
   font-size: 12px;
@@ -175,11 +174,11 @@ hr,
   display: block;
 }
 
-.line.first {
+.first {
   margin-top: 12px;
   padding-top: 13px;
 }
-.line.first:before {
+.first:before {
   display: block;
   position: absolute;
   top: 0;
@@ -188,10 +187,10 @@ hr,
   height: 1px;
   content: "";
 }
-.line.first .sender {
+.first .sender {
   display: inline-block;
 }
-.line.first .sender:before {
+.first .sender:before {
   display: block;
   content: attr(data-name);
 }
@@ -227,8 +226,4 @@ hr,
   color: inherit;
   background-color: inherit;
   font-style: italic;
-}
-
-.event .message {
-  display: inline;
 }
