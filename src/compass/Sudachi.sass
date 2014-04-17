@@ -3,11 +3,26 @@
 @import base/_mixin.sass
 @import _color_light.sass
 
+html
+  &:before
+    display: block
+    position: fixed
+    bottom: 0.25em
+    right: 0.33em
+    color: #ddd
+    font-size: 32px
+    font-weight: bold
+    font-style: italic
+    font-family: "Century Gothic", sans-serif
+    text-align: right
+    content: attr(channelname)
+
 body
   margin: 0
   padding: 1em
   font-size: 13px
   font-family: "Helvetica", sans-serif
+  text-shadow: 1px 1px 0 #fff
   line-height: 1.4
 
 a
