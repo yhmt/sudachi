@@ -83,7 +83,7 @@ hr {
 #topic-bar p {
   overflow: hidden;
   margin: 0 0.5em;
-  line-height: 1.2em;
+  line-height: 1.2;
   font-family: "Lucida Grande", "AquaKana", sans-serif;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -160,10 +160,12 @@ hr,
 }
 
 .sender {
-  display: none;
   line-height: 1.2;
   font-size: 13px;
   vertical-align: top;
+}
+.sender[first=false] {
+  display: none;
 }
 .sender:before {
   font-size: 18px;
